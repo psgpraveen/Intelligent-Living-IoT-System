@@ -1,0 +1,31 @@
+# === Backend: Express (iot-backend) ===
+iot-backend/node_modules/
+iot-backend/.env
+iot-backend/.env.local
+iot-backend/dist/
+iot-backend/.DS_Store
+iot-backend/npm-debug.log*
+iot-backend/*.log
+
+# === Frontend: Next.js (iot-dashboard) ===
+iot-dashboard/node_modules/
+iot-dashboard/.next/
+iot-dashboard/.env
+iot-dashboard/.env.local
+iot-dashboard/out/
+iot-dashboard/.DS_Store
+iot-dashboard/.vercel/
+iot-dashboard/npm-debug.log*
+
+# === Common OS / Editor Files ===
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# === IDEs / Editors ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
