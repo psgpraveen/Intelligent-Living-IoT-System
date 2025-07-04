@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  .btn {@apply px-4 py-2 rounded-lg font-medium disabled:opacity-50;}
+  .btn-primary {@apply bg-blue-600 text-white hover:bg-blue-700;}
+  .btn-secondary {@apply bg-gray-600 text-white hover:bg-gray-700;}
+  .input {@apply w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500;}
+  .card {@apply bg-white rounded-lg shadow p-6;}
+}
+
+/* 
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
