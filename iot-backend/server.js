@@ -16,7 +16,7 @@ const app = express(), PORT = process.env.PORT || 3001;
 
 app.use(helmet());
 app.use(rateLimit({ windowMs:15*60*1000, max:100 }));
-app.use(cors({ origin:['http://localhost:3000','https://intelligent-living-io-t-system.vercel.app'
+app.use(cors({ origin:['http://localhost:3000','https://intelligent-living-iot-system.vercel.app'
 ], credentials:true }));
 app.use(express.json());
 if(process.env.NODE_ENV==='development') app.use(morgan('dev'));
