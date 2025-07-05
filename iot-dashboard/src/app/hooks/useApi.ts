@@ -36,7 +36,14 @@ export const put = async <TResponse, TRequest = unknown>(
 };
 
 // Generic DELETE
-export const del = async <TResponse>(url: string): Promise<TResponse> => {
-  const res = await api.delete<TResponse>(url);
+// export const del = async <TResponse>(url: string): Promise<TResponse> => {
+//   const res = await api.delete<TResponse>(url);
+//   return res.data;
+// };
+export const del = async <TResponse, TRequest = unknown>(
+  url: string,
+  data?: TRequest
+): Promise<TResponse> => {
+  const res = await api.delete<TResponse>(url, { data });
   return res.data;
 };

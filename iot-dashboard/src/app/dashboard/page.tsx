@@ -168,14 +168,24 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <DeviceList
+          {/* <DeviceList
             devices={devices}
             selectedId={selDev?._id}
             onSelect={(dev) => {
               setSelDev(dev);
               setSelApp(null);
             }}
-          />
+          /> */}
+          <DeviceList
+  devices={devices}
+  selectedId={selDev?._id}
+  onSelect={(dev) => {
+    setSelDev(dev);
+    setSelApp(null);
+  }}
+  refresh={refreshDevices}
+/>
+
           {selDev && (
             <ApplianceList
               appliances={appls}
