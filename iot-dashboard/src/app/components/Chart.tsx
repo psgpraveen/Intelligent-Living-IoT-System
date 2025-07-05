@@ -86,7 +86,7 @@ export default function Chart({
                   backgroundColor: "#fff",
                   border: "1px solid #ccc",
                 }}
-                formatter={(value: any, name: string) => {
+                formatter={(value: number, name: string) => {
                   const unit =
                     name === "power"
                       ? "W"

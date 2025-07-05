@@ -12,6 +12,14 @@ interface Props {
   refresh: () => void;
 }
 
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export default function ApplianceModal({
   open,
   onClose,
@@ -25,7 +33,6 @@ export default function ApplianceModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Initialize form fields on open or when switching edit/add
   useEffect(() => {
     if (edit) {
       setName(edit.name);
@@ -39,7 +46,7 @@ export default function ApplianceModal({
     setError("");
   }, [open, edit]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -57,8 +64,9 @@ export default function ApplianceModal({
       }
       refresh();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Operation failed");
+    } catch (err) {
+      const axiosErr = err as AxiosError;
+      setError(axiosErr.response?.data?.message || "Operation failed");
     } finally {
       setLoading(false);
     }
@@ -72,8 +80,9 @@ export default function ApplianceModal({
       await del(`/appliances/${edit._id}`);
       refresh();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Delete failed");
+    } catch (err) {
+      const axiosErr = err as AxiosError;
+      setError(axiosErr.response?.data?.message || "Delete failed");
     } finally {
       setLoading(false);
     }
@@ -83,10 +92,7 @@ export default function ApplianceModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <form
-        onSubmit={handleSubmit}
-        className="card w-96 space-y-4 bg-white"
-      >
+      <form onSubmit={handleSubmit} className="card w-96 space-y-4 bg-white">
         <h3 className="text-xl font-semibold">
           {edit ? "Edit Appliance" : "Add Appliance"}
         </h3>
@@ -111,13 +117,11 @@ export default function ApplianceModal({
             className="input w-full"
             disabled={loading}
           >
-            {["Fan", "Light", "Heater", "AC", "Refrigerator", "Other"].map(
-              t => (
-                <option value={t} key={t}>
-                  {t}
-                </option>
-              )
-            )}
+            {["Fan", "Light", "Heater", "AC", "Refrigerator", "Other"].map(t => (
+              <option value={t} key={t}>
+                {t}
+              </option>
+            ))}
           </select>
         </div>
 

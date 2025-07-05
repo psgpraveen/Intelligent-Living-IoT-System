@@ -10,8 +10,7 @@ import ApplianceList from "../components/ApplianceList";
 import ApplianceDetail from "../components/ApplianceDetail";
 import Chart from "../components/Chart";
 import ApplianceModal from "../appliances/modal";
-import DeviceModal from "../devices/add/page";
-
+import DeviceModal from "@/app/components/DeviceModal";
 import { Device, Appliance, ApplianceData } from "../../types";
 
 export default function Dashboard() {
@@ -195,7 +194,7 @@ export default function Dashboard() {
         <main className="lg:col-span-3 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ApplianceDetail
-              appliance={selApp}
+              appliance={selApp ?? undefined}
               data={data}
               refresh={() => {
                 refreshData();

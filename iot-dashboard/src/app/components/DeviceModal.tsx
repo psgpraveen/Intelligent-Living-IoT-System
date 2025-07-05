@@ -1,6 +1,8 @@
 "use client";
+
 import { useState } from "react";
 import { post } from "@/app/hooks/useApi";
+import { AxiosError } from "axios";
 
 interface Props {
   open: boolean;
@@ -13,19 +15,21 @@ export default function DeviceModal({ open, onClose, refresh }: Props) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     try {
       await post("/devices", { deviceId, name });
       refresh();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to add device");
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      setError(error.response?.data?.message || "Failed to add device");
     }
   };
 
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <form onSubmit={handleSubmit} className="card w-96 space-y-4">
@@ -34,7 +38,7 @@ export default function DeviceModal({ open, onClose, refresh }: Props) {
           <label className="block mb-1">Device ID</label>
           <input
             value={deviceId}
-            onChange={e => setDeviceId(e.target.value)}
+            onChange={(e) => setDeviceId(e.target.value)}
             className="input"
             required
           />
@@ -43,15 +47,19 @@ export default function DeviceModal({ open, onClose, refresh }: Props) {
           <label className="block mb-1">Name</label>
           <input
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             className="input"
             required
           />
         </div>
         {error && <p className="text-red-600">{error}</p>}
         <div className="flex justify-end space-x-2">
-          <button type="button" onClick={onClose} className="btn">Cancel</button>
-          <button type="submit" className="btn btn-primary">Add</button>
+          <button type="button" onClick={onClose} className="btn">
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Add
+          </button>
         </div>
       </form>
     </div>
