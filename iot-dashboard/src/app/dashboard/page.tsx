@@ -76,7 +76,7 @@ export default function Dashboard() {
   const logout = () => {
     localStorage.clear();
     toast.success("Logged out.");
-    router.push("/login");
+    router.push("/");
   };
 
   const refreshDevices = () =>
@@ -104,7 +104,7 @@ export default function Dashboard() {
       <header className="bg-indigo-600 dark:bg-gray-800 text-white shadow p-4 sticky top-0 z-50">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <h1 className="text-xl font-semibold">IoT Dashboard</h1>
+            <h1 className="text-xl font-semibold">Intelligent Living Dashboard</h1>
             {user && (
               <span className="text-sm text-indigo-100 dark:text-gray-300">
                 {user.name} ({user.email})
