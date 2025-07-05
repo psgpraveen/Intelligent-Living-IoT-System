@@ -5,15 +5,12 @@ import { useRouter } from "next/navigation";
 import { post } from "../hooks/useApi";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-  const [err, setErr] = useState("");
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handle = (e: ChangeEvent<HTMLInputElement>) => {
@@ -22,13 +19,16 @@ export default function SignupPage() {
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErr("");
+    setLoading(true);
     try {
       await post("/auth/register", form);
+      toast.success("✅ Signup successful. Please login.");
       router.push("/login");
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
-      setErr(err.response?.data?.message || "Signup failed");
+      toast.error(err.response?.data?.message || "❌ Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,7 +36,7 @@ export default function SignupPage() {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100 px-4">
       <form
         onSubmit={submit}
-        className="card w-full max-w-md p-8 bg-white shadow-xl rounded-xl space-y-6"
+        className="w-full max-w-md bg-white p-8 rounded-xl shadow-xl space-y-6"
       >
         <div className="text-center">
           <h2 className="text-3xl font-bold text-indigo-600">Create Account</h2>
@@ -44,10 +44,14 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">Name</label>
+          <label htmlFor="name" className="block mb-1 font-medium">
+            Name
+          </label>
           <input
+            id="name"
             name="name"
             onChange={handle}
+            value={form.name}
             className="input w-full"
             required
             placeholder="John Doe"
@@ -55,11 +59,15 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">Email</label>
+          <label htmlFor="email" className="block mb-1 font-medium">
+            Email
+          </label>
           <input
+            id="email"
             name="email"
             type="email"
             onChange={handle}
+            value={form.email}
             className="input w-full"
             required
             placeholder="john@example.com"
@@ -67,11 +75,15 @@ export default function SignupPage() {
         </div>
 
         <div className="relative">
-          <label className="block mb-1 font-medium">Password</label>
+          <label htmlFor="password" className="block mb-1 font-medium">
+            Password
+          </label>
           <input
+            id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             onChange={handle}
+            value={form.password}
             className="input w-full pr-10"
             required
             placeholder="••••••••"
@@ -86,18 +98,19 @@ export default function SignupPage() {
           </button>
         </div>
 
-        {err && <p className="text-red-600 text-sm">{err}</p>}
-
         <button
           type="submit"
-          className="btn btn-primary w-full"
+          className="btn btn-primary w-full flex justify-center items-center gap-2"
+          disabled={loading}
         >
-          Sign Up
+          {loading ? "Creating..." : "Sign Up"}
         </button>
 
         <p className="text-xs text-gray-500 text-center">
           By signing up, you agree to our{" "}
-          <span className="text-indigo-600 underline cursor-pointer">Terms & Conditions</span>.
+          <span className="text-indigo-600 underline cursor-pointer">
+            Terms & Conditions
+          </span>.
         </p>
 
         <p className="text-sm text-center text-gray-600">

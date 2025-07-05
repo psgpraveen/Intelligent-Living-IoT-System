@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { post } from "../hooks/useApi";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface LoginResponse {
   token: string;
@@ -17,8 +18,8 @@ interface LoginResponse {
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const [err, setErr] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handle = (e: ChangeEvent<HTMLInputElement>) =>
@@ -26,15 +27,19 @@ export default function LoginPage() {
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErr("");
+    setLoading(true);
+
     try {
       const res = await post<LoginResponse>("/auth/login", form);
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
+      toast.success("✅ Logged in successfully");
       router.push("/dashboard");
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
-      setErr(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "❌ Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,8 +57,11 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="block mb-1 text-sm font-medium">Email</label>
+          <label htmlFor="email" className="block mb-1 text-sm font-medium">
+            Email
+          </label>
           <input
+            id="email"
             name="email"
             type="email"
             onChange={handle}
@@ -61,12 +69,16 @@ export default function LoginPage() {
             className="input w-full"
             placeholder="you@example.com"
             required
+            autoFocus
           />
         </div>
 
         <div className="relative">
-          <label className="block mb-1 text-sm font-medium">Password</label>
+          <label htmlFor="password" className="block mb-1 text-sm font-medium">
+            Password
+          </label>
           <input
+            id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             onChange={handle}
@@ -78,17 +90,19 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute top-9 right-3 text-gray-500"
+            className="absolute top-9 right-3 text-gray-500 hover:text-gray-700"
             aria-label="Toggle password visibility"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
 
-        {err && <p className="text-red-600 text-sm">{err}</p>}
-
-        <button type="submit" className="btn btn-primary w-full">
-          Sign In
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-primary w-full flex justify-center items-center gap-2"
+        >
+          {loading ? "Signing in..." : "Sign In"}
         </button>
 
         <div className="text-center text-sm text-gray-600">
