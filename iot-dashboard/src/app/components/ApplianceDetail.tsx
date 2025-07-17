@@ -210,7 +210,7 @@ export default function ApplianceDetail({ appliance, data, refresh }: Props) {
       {/* Live Readings */}
       {latest ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {(["voltage", "current", "power", "status"] as const).map((key) => (
+          {(["voltage", "current", "power"] as const).map((key) => (
             <div key={key} className="card text-center">
               <h3 className="text-sm text-gray-500 capitalize">{key}</h3>
               <p className="text-xl font-bold">
