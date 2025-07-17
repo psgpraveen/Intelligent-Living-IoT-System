@@ -70,6 +70,8 @@ router.delete('/:id', authenticate, async (req, res, next) => {
 router.post('/:id/control', authenticate, async (req, res, next) => {
   try {
     const { action, ratePerKWh = 8 } = req.body;
+    console.log(req.params.id);
+    
     const appliance = await Appliance.findById(req.params.id);
     if (!appliance) return res.status(404).json({ message: 'Appliance not found' });
 

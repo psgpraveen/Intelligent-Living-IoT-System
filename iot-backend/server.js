@@ -15,8 +15,15 @@ connectDB();
 const app = express(), PORT = process.env.PORT || 3001;
 
 app.use(helmet());
-app.use(rateLimit({ windowMs:15*60*1000, max:100 }));
-app.use(cors({ origin:['http://localhost:3000','https://intelligent-living-iot-system.vercel.app'
+// app.use(rateLimit({ windowMs:15*60*1000, max:100 }));
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   message: "Too many requests, please try again later.",
+// });
+
+// app.use(limiter);
+app.use(cors({ origin:['http://localhost:3000','http://10.72.55.88:3000','https://intelligent-living-iot-system.vercel.app'
 ], credentials:true }));
 app.use(express.json());
 if(process.env.NODE_ENV==='development') app.use(morgan('dev'));

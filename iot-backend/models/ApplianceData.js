@@ -11,4 +11,4 @@ const dataSchema = new mongoose.Schema({
 
 dataSchema.index({ appliance: 1, timestamp: -1 });
 
-export default mongoose.model('applianceData', dataSchema);
+export default mongoose.models.ApplianceData || mongoose.model('ApplianceData', dataSchema);

@@ -18,4 +18,4 @@ const applianceSchema = new mongoose.Schema({
   powerThresholdHigh: { type: Number, default: 0 }
 }, { timestamps: true });
 
-export default mongoose.model('Appliance', applianceSchema);
+export default mongoose.models.Appliance || mongoose.model('Appliance', applianceSchema);
