@@ -47,31 +47,51 @@ export default function Dashboard() {
     refreshAppliances();
   }, [selDev]);
 
-  useEffect(() => {
-    setData([]);
-    if (!selApp) return;
+  // useEffect(() => {
+  //   setData([]);
+  //   if (!selApp) return;
 
+  //   get<ApplianceData[]>(`/data?applianceId=${selApp._id}`)
+  //     .then(setData)
+  //     .catch(() => toast.error("Failed to load historical data."));
+
+  //   const token = localStorage.getItem("token");
+  //   const url = `http://localhost:3001/api/stream?applianceId=${selApp._id}` +
+  //     (token ? `&token=${token}` : "");
+  //   const es = new EventSource(url);
+
+  //   es.onmessage = (e) => {
+  //     const rec: ApplianceData = JSON.parse(e.data);
+  //     setData((prev) => [rec, ...prev.slice(0, 99)]);
+  //   };
+
+  //   // es.onerror = () => {
+  //   //   toast.error("Live data stream disconnected.");
+  //   //   es.close();
+  //   // };
+
+  //   return () => es.close();
+  // }, [selApp]);
+
+
+  useEffect(() => {
+  setData([]);
+  if (!selApp) return;
+
+  const fetchData = () => {
     get<ApplianceData[]>(`/data?applianceId=${selApp._id}`)
       .then(setData)
-      .catch(() => toast.error("Failed to load historical data."));
+      .catch(() => toast.error("Failed to load appliance data."));
+  };
 
-    const token = localStorage.getItem("token");
-    const url = `http://localhost:3001/api/stream?applianceId=${selApp._id}` +
-      (token ? `&token=${token}` : "");
-    const es = new EventSource(url);
+  // Initial load
+  fetchData();
 
-    es.onmessage = (e) => {
-      const rec: ApplianceData = JSON.parse(e.data);
-      setData((prev) => [rec, ...prev.slice(0, 99)]);
-    };
+  // Poll every 3 seconds
+  const intervalId = setInterval(fetchData, 3000);
 
-    es.onerror = () => {
-      toast.error("Live data stream disconnected.");
-      es.close();
-    };
-
-    return () => es.close();
-  }, [selApp]);
+  return () => clearInterval(intervalId);
+}, [selApp]);
 
   const logout = () => {
     localStorage.clear();
