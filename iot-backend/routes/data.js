@@ -25,7 +25,6 @@ router.get('/relay-state', async (req, res) => {
   }
 
   const appliance = await Appliance.findById(applianceId);
-
   if (!appliance) return res.status(404).json({ message: 'Appliance not found' });
 
   return res.json({ status: appliance.currentStatus }); // "ON" or "OFF"
@@ -37,65 +36,40 @@ router.post('/', async (req, res, next) => {
   try {
     const { appliance: applianceId, voltage, current, power, status, timestamp } = req.body;
 
+    // ✅ Secret-based auth for ESP32
     const espSecret = req.headers['x-iot-secret'];
     if (process.env.ESP32_SECRET && espSecret !== process.env.ESP32_SECRET) {
       return res.status(403).json({ message: 'Unauthorized device: Invalid ESP32 secret' });
     }
 
+    // ✅ Validate appliance ID
     if (!mongoose.Types.ObjectId.isValid(applianceId)) {
       return res.status(400).json({ message: 'Invalid appliance ID' });
     }
 
     const objectId = new mongoose.Types.ObjectId(applianceId);
+
+    // ✅ Find appliance
     const appliance = await Appliance.findById(objectId);
-    if (!appliance) return res.status(404).json({ message: 'Appliance not found' });
+    console.log(`🔍 Appliance found: ${appliance?.name || 'None'}`);
+    if (!appliance) {
+      return res.status(404).json({ message: 'Appliance not found' });
+    }
 
-   if (
-  typeof voltage !== 'number' ||
-  typeof current !== 'number' ||
-  typeof power !== 'number'
-) {
-  return res.status(400).json({ message: 'Invalid sensor data' });
-}
+    // ✅ Validate sensor fields
+    if (
+      typeof voltage !== 'number' ||
+      typeof current !== 'number' ||
+      typeof power !== 'number' 
+    ) {
+      return res.status(400).json({ message: 'Invalid sensor data' });
+    }
 
-let inferredStatus = status;
-if (!['ON', 'OFF'].includes(status)) {
-  inferredStatus = power > 2 ? 'ON' : 'OFF';
-}
-
-    // ✅ Define incomingTime BEFORE using it
     const incomingTime = timestamp ? new Date(timestamp) : new Date();
-    const ratePerKWh = 8; // or make this dynamic
 
-    // ✅ Handle ON → OFF state update
-    if (appliance.currentStatus === 'ON' && status === 'OFF' && appliance.lastOnAt) {
-      const elapsedMs = incomingTime - appliance.lastOnAt;
-      const elapsedHours = elapsedMs / 3600000;
-      const avgWatt = appliance.powerRating || 0;
-      const deltaEnergyWh = elapsedHours * avgWatt;
-      const deltaBill = +(deltaEnergyWh / 1000 * ratePerKWh).toFixed(2);
-
-      appliance.totalRunMs += elapsedMs;
-      appliance.totalEnergyWh += deltaEnergyWh;
-      appliance.lastOnAt = null;
-
-      await ApplianceHistory.create({
-        appliance: appliance._id,
-        totalRunMs: appliance.totalRunMs,
-        totalEnergyWh: appliance.totalEnergyWh,
-        sessionRunMs: elapsedMs,
-        sessionEnergyWh: deltaEnergyWh,
-        computedBill: deltaBill,
-        timestamp: incomingTime
-      });
-    }
-    // ✅ Handle OFF → ON transition
-    else if (appliance.currentStatus === 'OFF' && status === 'ON') {
-      appliance.lastOnAt = incomingTime;
-    }
-
-    // ✅ Skip duplicates
+    // ✅ Get last reading
     const lastReading = await ApplianceData.findOne({ appliance: objectId }).sort({ timestamp: -1 });
+
     const isDuplicate =
       lastReading &&
       lastReading.status === status &&
@@ -117,7 +91,7 @@ if (!['ON', 'OFF'].includes(status)) {
       timestamp: incomingTime
     });
 
-    // ✅ Save updated appliance status
+    // ✅ Update appliance status
     appliance.currentStatus = status;
     await appliance.save();
 
