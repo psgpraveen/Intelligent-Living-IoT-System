@@ -60,7 +60,7 @@ router.post('/', async (req, res, next) => {
 
 let inferredStatus = status;
 if (!['ON', 'OFF'].includes(status)) {
-  inferredStatus = power > 5 ? 'ON' : 'OFF';
+  inferredStatus = power > 2 ? 'ON' : 'OFF';
 }
 
     // ✅ Define incomingTime BEFORE using it
